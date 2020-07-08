@@ -11,6 +11,7 @@
             <th style="width: 3%;"></th>
             <th>VIN</th>
             <th style="width: 10%;">Sold?</th>
+            <th>Date Sold</th>
             <th>Brand</th>
             <th style="width: 10%;">Year</th>
             <th style="width: 10%;">Color</th>
@@ -18,7 +19,7 @@
     </ng-template>
     <ng-template pTemplate="body" let-rowData let-index="rowIndex">
         <ng-container formArrayName="carForms">
-            <tr [formGroupName]="index">
+            <tr [formGroupName]="index" class="ui-fluid">
                 <td style="text-align: center;">
                     <i class="pi pi-times" style="color: darkred;" (click)="deleteRow(index)"></i>
                     <!--button pButton type="button" class="ui-button-secondary" icon="pi pi-times" iconPos="left" (click)="onDeleteRow(rowIndex)"></button-->
@@ -40,6 +41,16 @@
                 <td style="text-align: center;">
                     <!--p-toggleButton onLabel="" offLabel="" onIcon="pi pi-check" offIcon="pi pi-times" (onChange)="toggleSold($event, rowData)"></p-toggleButton-->
                     <p-checkbox binary="true" formControlName="sold" (keydown)="onKeyDown($event)"></p-checkbox>
+                </td>                
+                <td pEditableColumn [pEditableColumnField]="'soldDate'" [pEditableColumnRowIndex]="index">
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <p-calendar formControlName="saleDate" [showIcon]="true" dateFormat="mm/dd/yy"></p-calendar>
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{rowData.get('saleDate').value | date:'MM/dd/yyyy'}}
+                        </ng-template>
+                    </p-cellEditor>
                 </td>
                 <td pEditableColumn [pEditableColumnField]="'brand'" [pEditableColumnRowIndex]="index">
                     <p-cellEditor>
