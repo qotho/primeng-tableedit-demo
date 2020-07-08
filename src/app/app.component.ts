@@ -91,7 +91,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         sold: [''],
         price : [''],
         saleDate : [''],
-        isEditable: [true]
+        isEditable: [true] // Only needed if we are using our own table
       });
     }
 

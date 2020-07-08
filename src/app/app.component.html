@@ -10,8 +10,9 @@
         <tr>
             <th style="width: 3%;"></th>
             <th>VIN</th>
-            <th style="width: 10%;">Year</th>
+            <th style="width: 10%;">Sold?</th>
             <th>Brand</th>
+            <th style="width: 10%;">Year</th>
             <th style="width: 10%;">Color</th>
         </tr>
     </ng-template>
@@ -36,19 +37,9 @@
                         </ng-template>
                     </p-cellEditor>
                 </td>
-                <td pEditableColumn [pEditableColumnField]="'year'" [pEditableColumnRowIndex]="index">
-                    <p-cellEditor>
-                        <ng-template pTemplate="input">
-                            <input pInputText type="text" formControlName="year" required>
-                            <div class="text-danger" *ngIf="rowData.get('year')?.errors && (rowData.get('year')?.dirty || rowData.get('year')?.touched)">
-                                <small *ngIf="rowData.get('year').errors?.required">Year is Required</small>
-                                <small *ngIf="rowData.get('year').errors?.pattern">Numbers only, 4 digits required</small>
-                            </div>
-                        </ng-template>
-                        <ng-template pTemplate="output">
-                            {{rowData.get('year').value}}
-                        </ng-template>
-                    </p-cellEditor>
+                <td style="text-align: center;">
+                    <!--p-toggleButton onLabel="" offLabel="" onIcon="pi pi-check" offIcon="pi pi-times" (onChange)="toggleSold($event, rowData)"></p-toggleButton-->
+                    <p-checkbox binary="true" formControlName="sold" (keydown)="onKeyDown($event)"></p-checkbox>
                 </td>
                 <td pEditableColumn [pEditableColumnField]="'brand'" [pEditableColumnRowIndex]="index">
                     <p-cellEditor>
@@ -60,6 +51,20 @@
                         </ng-template>
                         <ng-template pTemplate="output">
                             {{rowData.get('brand').value}}
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                <td pEditableColumn [pEditableColumnField]="'year'" [pEditableColumnRowIndex]="index">
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <input pInputText type="text" formControlName="year" required>
+                            <div class="text-danger" *ngIf="rowData.get('year')?.errors && (rowData.get('year')?.dirty || rowData.get('year')?.touched)">
+                                <small *ngIf="rowData.get('year').errors?.required">Year is Required</small>
+                                <small *ngIf="rowData.get('year').errors?.pattern">Numbers only, 4 digits required</small>
+                            </div>
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{rowData.get('year').value}}
                         </ng-template>
                     </p-cellEditor>
                 </td>
@@ -76,10 +81,6 @@
                         </ng-template>
                     </p-cellEditor>
                 </td>
-                <!--td style="text-align: center;">
-                <p-toggleButton onLabel="" offLabel="" onIcon="pi pi-check" offIcon="pi pi-times" (onChange)="toggleSold($event, rowData)"></p-toggleButton>
-                <p-checkbox binary="true" checked="{{rowData.sold}}" (onChange)="toggleSold($event, rowData)" (keydown)="onKeyDown($event)"></p-checkbox>
-                </td-->
             </tr>
         </ng-container>
     </ng-template>
