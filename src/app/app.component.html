@@ -1,0 +1,62 @@
+<p-toast></p-toast>
+
+<h3 class="first">Cell Editing Demo</h3>
+<p-table [value]="cars1" (onEditInit)="onCellEdit($event)" (onEditComplete)="onCellEditComplete($event)">
+    <ng-template pTemplate="header">
+        <tr>
+            <th>VIN</th>
+            <th>Year</th>
+            <th>Brand</th>
+            <th>Color</th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-rowData let-index="rowIndex">
+        <tr [formGroup]="carForm">
+            <td #vin pEditableColumn [pEditableColumnField]="'vin'" [pEditableColumnRowIndex]="index">
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" formControlName="vin">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{rowData.vin}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td pEditableColumn [pEditableColumnField]="'year'" [pEditableColumnRowIndex]="index">
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" formControlName="year" required>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{rowData.year}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td pEditableColumn [pEditableColumnField]="'brand'" [pEditableColumnRowIndex]="index">
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <p-dropdown [options]="brands" formControlName="brand" [style]="{'width':'100%'}"></p-dropdown>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{rowData.brand}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td pEditableColumn [pEditableColumnField]="'color'" [pEditableColumnRowIndex]="index">
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputText type="text" formControlName="color" (keydown)="onKeyDown($event)">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{rowData.color}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <!--td style="text-align: center;">
+              <p-toggleButton onLabel="" offLabel="" onIcon="pi pi-check" offIcon="pi pi-times" (onChange)="toggleSold($event, rowData)"></p-toggleButton>
+              <p-checkbox binary="true" checked="{{rowData.sold}}" (onChange)="toggleSold($event, rowData)" (keydown)="onKeyDown($event)"></p-checkbox>
+            </td-->
+        </tr>
+    </ng-template>
+</p-table>
+
