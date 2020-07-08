@@ -1,7 +1,8 @@
 <p-toast></p-toast>
 
 <h3 class="first">Cell Editing Demo</h3>
-<p-table [value]="cars1" (onEditInit)="onCellEdit($event)" (onEditComplete)="onCellEditComplete($event)">
+<form [formGroup]="mainForm">
+<p-table [value]="mainForm.get('carForms').controls" (onEditInit)="onCellEdit($event)" (onEditComplete)="onCellEditComplete($event)">
     <ng-template pTemplate="caption">
         List of Cars
     </ng-template>
@@ -15,59 +16,83 @@
         </tr>
     </ng-template>
     <ng-template pTemplate="body" let-rowData let-index="rowIndex">
-        <tr [formGroup]="mainForm">
-            <td style="text-align: center;">
-                <i class="pi pi-times" style="color: darkred;" (click)="onDeleteRow(index)"></i>
-                <!--button pButton type="button" class="ui-button-secondary" icon="pi pi-times" iconPos="left" (click)="onDeleteRow(rowIndex)"></button-->
-            </td>
-            <td #vin pEditableColumn [pEditableColumnField]="'vin'" [pEditableColumnRowIndex]="index">
-                <p-cellEditor>
-                    <ng-template pTemplate="input">
-                        <input pInputText type="text" formControlName="vin">
-                    </ng-template>
-                    <ng-template pTemplate="output">
-                        {{rowData.vin}}
-                    </ng-template>
-                </p-cellEditor>
-            </td>
-            <td pEditableColumn [pEditableColumnField]="'year'" [pEditableColumnRowIndex]="index">
-                <p-cellEditor>
-                    <ng-template pTemplate="input">
-                        <input pInputText type="text" formControlName="year" required>
-                    </ng-template>
-                    <ng-template pTemplate="output">
-                        {{rowData.year}}
-                    </ng-template>
-                </p-cellEditor>
-            </td>
-            <td pEditableColumn [pEditableColumnField]="'brand'" [pEditableColumnRowIndex]="index">
-                <p-cellEditor>
-                    <ng-template pTemplate="input">
-                        <p-dropdown [options]="brands" formControlName="brand" [style]="{'width':'100%'}"></p-dropdown>
-                    </ng-template>
-                    <ng-template pTemplate="output">
-                        {{rowData.brand}}
-                    </ng-template>
-                </p-cellEditor>
-            </td>
-            <td pEditableColumn [pEditableColumnField]="'color'" [pEditableColumnRowIndex]="index">
-                <p-cellEditor>
-                    <ng-template pTemplate="input">
-                        <input pInputText type="text" formControlName="color" (keydown)="onKeyDown($event)">
-                    </ng-template>
-                    <ng-template pTemplate="output">
-                        {{rowData.color}}
-                    </ng-template>
-                </p-cellEditor>
-            </td>
-            <!--td style="text-align: center;">
-              <p-toggleButton onLabel="" offLabel="" onIcon="pi pi-check" offIcon="pi pi-times" (onChange)="toggleSold($event, rowData)"></p-toggleButton>
-              <p-checkbox binary="true" checked="{{rowData.sold}}" (onChange)="toggleSold($event, rowData)" (keydown)="onKeyDown($event)"></p-checkbox>
-            </td-->
-        </tr>
+        <ng-container formArrayName="carForms">
+            <tr [formGroupName]="index">
+                <td style="text-align: center;">
+                    <i class="pi pi-times" style="color: darkred;" (click)="deleteRow(index)"></i>
+                    <!--button pButton type="button" class="ui-button-secondary" icon="pi pi-times" iconPos="left" (click)="onDeleteRow(rowIndex)"></button-->
+                </td>
+                <td #vin pEditableColumn [pEditableColumnField]="'vin'" [pEditableColumnRowIndex]="index">
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <input pInputText type="text" formControlName="vin">
+                            <div class="text-danger" *ngIf="rowData.get('vin')?.errors && (rowData.get('vin')?.dirty || rowData.get('vin')?.touched)">
+                                <small *ngIf="rowData.get('vin').errors?.required">VIN is required</small>
+                                <small *ngIf="rowData.get('vin').errors?.minlength">VIN must be at least {{rowData.get('vin').errors?.minlength.requiredLength}} characters</small>
+                            </div>
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{rowData.get('vin').value}}
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                <td pEditableColumn [pEditableColumnField]="'year'" [pEditableColumnRowIndex]="index">
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <input pInputText type="text" formControlName="year" required>
+                            <div class="text-danger" *ngIf="rowData.get('year')?.errors && (rowData.get('year')?.dirty || rowData.get('year')?.touched)">
+                                <small *ngIf="rowData.get('year').errors?.required">Year is Required</small>
+                                <small *ngIf="rowData.get('year').errors?.pattern">Numbers only, 4 digits required</small>
+                            </div>
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{rowData.get('year').value}}
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                <td pEditableColumn [pEditableColumnField]="'brand'" [pEditableColumnRowIndex]="index">
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <p-dropdown [options]="brands" formControlName="brand" [style]="{'width':'100%'}"></p-dropdown>
+                            <div class="text-danger" *ngIf="rowData.get('brand')?.errors && (rowData.get('brand')?.dirty || rowData.get('brand')?.touched)">
+                                <small *ngIf="rowData.get('brand').errors?.required">Brand is required</small>
+                            </div>
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{rowData.get('brand').value}}
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                <td pEditableColumn [pEditableColumnField]="'color'" [pEditableColumnRowIndex]="index">
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <input pInputText type="text" formControlName="color" (keydown)="onKeyDown($event)">
+                            <div class="text-danger" *ngIf="rowData.get('color')?.errors && (rowData.get('color')?.dirty || rowData.get('color')?.touched)">
+                                <small *ngIf="rowData.get('color').errors?.required">Color is required</small>
+                            </div>
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{rowData.get('color').value}}
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                <!--td style="text-align: center;">
+                <p-toggleButton onLabel="" offLabel="" onIcon="pi pi-check" offIcon="pi pi-times" (onChange)="toggleSold($event, rowData)"></p-toggleButton>
+                <p-checkbox binary="true" checked="{{rowData.sold}}" (onChange)="toggleSold($event, rowData)" (keydown)="onKeyDown($event)"></p-checkbox>
+                </td-->
+            </tr>
+        </ng-container>
     </ng-template>
+    <ng-template pTemplate="summary" let-rowData>
+        <div style="height: 2.3em;">
+          <button pButton type="button" class="ui-toolbar-group-left" (click)="addRow()" label="Add Row"></button>
+          <button pButton type="button" class="ui-toolbar-group-right" label="Save" [disabled]="!mainForm.valid"></button>
+        </div>
+      </ng-template>
 </p-table>
+</form>
 <div class="output">
-    <p>Form Data:  {{mainForm.value | json}}</p>
-    <p>Is Valid: {{mainForm.valid}}</p>
+    <h3>Is Valid: {{mainForm.valid}}</h3>
+    <h3>Form Data:</h3>
+    <ngx-json-viewer [json]="mainForm.value"></ngx-json-viewer>
 </div>

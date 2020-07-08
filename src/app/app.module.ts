@@ -1,10 +1,10 @@
-import { NgModule }      from '@angular/core';
+import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import {FormsModule,ReactiveFormsModule} from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { AppComponent }   from './app.component';
+import { AppComponent } from './app.component';
 import { CarService } from './carservice';
 
 import {TableModule} from 'primeng/table';
@@ -20,7 +20,7 @@ import {DropdownModule} from 'primeng/dropdown';
 import {ProgressBarModule} from 'primeng/progressbar';
 import {InputTextModule} from 'primeng/inputtext';
 import {CheckboxModule} from 'primeng/checkbox';
-
+import { NgxJsonViewerModule } from 'ngx-json-viewer';
 
 @NgModule({
   imports: [
@@ -28,17 +28,18 @@ import {CheckboxModule} from 'primeng/checkbox';
     BrowserAnimationsModule,
     TableModule,
     CalendarModule,
-		SliderModule,
-		DialogModule,
-		MultiSelectModule,
-		ContextMenuModule,
-		DropdownModule,
-		ButtonModule,
+    SliderModule,
+    DialogModule,
+    MultiSelectModule,
+    ContextMenuModule,
+    DropdownModule,
+    ButtonModule,
     ToggleButtonModule,
-		ToastModule,
+    ToastModule,
     InputTextModule,
     ProgressBarModule,
     CheckboxModule,
+    NgxJsonViewerModule,
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule

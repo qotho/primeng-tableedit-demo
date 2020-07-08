@@ -9,20 +9,14 @@ import { SelectItem, MessageService } from 'primeng/api';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: [ './app.component.css' ],
-  providers: [MessageService]
+  providers: [MessageService],
 })
 export class AppComponent implements OnInit, AfterViewInit {
     mainForm: FormGroup;
 
-    carForms: FormArray;
-
-    cars1: Car[];
-
-    cars2: Car[];
+    cars: Car[];
 
     brands: SelectItem[];
-
-    clonedCars: { [s: string]: Car; } = {};
 
     cellBeingEdited: string;
 
@@ -33,11 +27,30 @@ export class AppComponent implements OnInit, AfterViewInit {
     // @ViewChildren('vin', {read: EditableColumn}) private editableColumns: QueryList<EditableColumn>;
     @ViewChildren('vin') private editableColumns: QueryList<ElementRef>;
 
-    constructor(private fb: FormBuilder, private carService: CarService, private messageService: MessageService) { }
+    constructor(
+      private fb: FormBuilder,
+      private carService: CarService,
+      private messageService: MessageService
+    ) { }
 
     ngOnInit() {
-        this.carService.getCarsSmall().then(cars => this.cars1 = cars);
-        this.carService.getCarsSmall().then(cars => this.cars2 = cars);
+      this.mainForm = this.fb.group({
+        carForms: this.fb.array([])
+      });
+      this.carService.getCarsSmall().then(
+        cars => {
+          this.cars = cars;
+          if (!cars || cars.length < 1) {
+            this.addRow();
+          } else {
+            cars.forEach((car: Car, index: number) => {
+              const newCarForm = this.newCarForm();
+              this.updateCarForm(newCarForm, car);
+              // this.cars1.push({'brand': '', 'year': 2020, 'color': '', 'vin': '', 'sold': false});
+              this.carForms.push(newCarForm);
+            });
+          }
+        });
 
         this.brands = [
             {label: 'Audi', value: 'Audi'},
@@ -51,23 +64,10 @@ export class AppComponent implements OnInit, AfterViewInit {
             {label: 'VW', value: 'VW'},
             {label: 'Volvo', value: 'Volvo'}
         ];
-
-
-        this.mainForm = this.fb.group({
-            'vin': new FormControl('', [Validators.required, Validators.minLength(6)]),
-            'year': new FormControl('', Validators.required),
-            'brand': new FormControl('', Validators.required),
-            'color': new FormControl('', [Validators.required]),
-            'sold': new FormControl('', [Validators.required]),
-            'price' : new FormControl(''),
-            'saleDate' : new FormControl('')
-          },
-          {updateOn: 'blur'}
-        );
     }
 
     ngAfterViewInit() {
-      console.log(this.editableColumns);
+      // this.carForms = this.mainForm.get('carForms') as FormArray;
       this.editableColumns.changes.subscribe(list => {
         if (this.newRowAdded) {
             setTimeout(() => {
@@ -78,54 +78,82 @@ export class AppComponent implements OnInit, AfterViewInit {
       });
     }
 
-    onNewRow(event) {
+    get carForms(): FormArray {
+      return this.mainForm.get('carForms') as FormArray;
+    }
 
+    newCarForm(): FormGroup {
+      return this.fb.group({
+        vin: ['', [Validators.required, Validators.minLength(6)]],
+        year: ['', [Validators.required, Validators.pattern(/^\d{4}$/)]],
+        brand: ['', Validators.required],
+        color: ['', [Validators.required]],
+        sold: [''],
+        price : [''],
+        saleDate : [''],
+        isEditable: [true]
+      });
+    }
+
+    updateCarForm(newCarForm: FormGroup, car: Car): void {
+      newCarForm.patchValue({
+        vin: car.vin,
+        year: car.year,
+        brand: car.brand,
+        color: car.color,
+        sold: car.sold,
+        price: car.price,
+        saleDate : car.saleDate
+      });
     }
 
     onCellEdit(event) {
       this.rowBeingEdited = event.index;
       this.cellBeingEdited = event.field;
-      const car = this.cars1[event.index];
-      const patched = {};
-      patched[event.field] = car[event.field];
-      this.mainForm.patchValue(patched);
+      //const car = this.cars[event.index];
+      //const patched = {};
+      //patched[event.field] = car[event.field];
+      //this.mainForm.patchValue(patched);
       // this.mainForm.markAsPending();
-      this.mainForm.markAsDirty();
+      // this.mainForm.markAsDirty();
     }
 
     onCellEditComplete(event) {
-      const car = this.cars1[this.rowBeingEdited];
-      console.log(event);
-      car[event.field] = this.mainForm.get(event.field).value;
+      // const car = this.cars[this.rowBeingEdited];
+      // car[event.field] = this.mainForm.get(event.field).value;
 
       if (
         event.originalEvent.key && event.originalEvent.key === 'Enter' &&
-        this.cellBeingEdited === 'color' && this.rowBeingEdited === this.cars1.length - 1
+        this.cellBeingEdited === 'color' && this.rowBeingEdited === this.cars.length - 1
       ) {
-        this.addNewRow();
+        this.addRow();
       }
 
       this.rowBeingEdited = -1;
       this.cellBeingEdited = null;
+ }
+
+    addRow() {
+      this.carForms.push(this.newCarForm());
+      // this.cars1.push({'brand': '', 'year': 2020, 'color': '', 'vin': '', 'sold': false});
+      this.newRowAdded = true;
     }
 
-    addNewRow() {
-        this.cars1.push({'brand': '', 'year': 2020, 'color': '', 'vin': '', 'sold': false});
-        this.newRowAdded = true;
-        // console.log(this.editableColumns[this.cars1.length - 1]);
-        // this.editableColumns[this.cars1.length - 1].nativeElement.click();
+    deleteRow(index: number) {
+      this.carForms.removeAt(index);
+      // this.cars1.splice(rowIndex, 1);
     }
 
-    onDeleteRow(rowIndex: number): void {
-      this.cars1.splice(rowIndex, 1);
+    editRow(group: FormGroup) {
+      group.get('isEditable').setValue(true);
     }
 
     onKeyDown(event: KeyboardEvent) {
       if (
-        event.key === 'Tab' && this.cellBeingEdited === 'color' &&
-        this.rowBeingEdited === this.cars1.length - 1
+        event.key === 'Tab' && !event.shiftKey && this.cellBeingEdited === 'color' &&
+        this.rowBeingEdited === this.carForms.controls.length - 1
       ) {
-        this.addNewRow();
+        this.addRow();
       }
     }
 
