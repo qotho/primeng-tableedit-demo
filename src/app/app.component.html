@@ -2,16 +2,24 @@
 
 <h3 class="first">Cell Editing Demo</h3>
 <p-table [value]="cars1" (onEditInit)="onCellEdit($event)" (onEditComplete)="onCellEditComplete($event)">
+    <ng-template pTemplate="caption">
+        List of Cars
+    </ng-template>
     <ng-template pTemplate="header">
         <tr>
+            <th style="width: 3%;"></th>
             <th>VIN</th>
-            <th>Year</th>
+            <th style="width: 10%;">Year</th>
             <th>Brand</th>
-            <th>Color</th>
+            <th style="width: 10%;">Color</th>
         </tr>
     </ng-template>
     <ng-template pTemplate="body" let-rowData let-index="rowIndex">
-        <tr [formGroup]="carForm">
+        <tr [formGroup]="mainForm">
+            <td style="text-align: center;">
+                <i class="pi pi-times" style="color: darkred;" (click)="onDeleteRow(index)"></i>
+                <!--button pButton type="button" class="ui-button-secondary" icon="pi pi-times" iconPos="left" (click)="onDeleteRow(rowIndex)"></button-->
+            </td>
             <td #vin pEditableColumn [pEditableColumnField]="'vin'" [pEditableColumnRowIndex]="index">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
@@ -59,4 +67,7 @@
         </tr>
     </ng-template>
 </p-table>
-
+<div class="output">
+    <p>Form Data:  {{mainForm.value | json}}</p>
+    <p>Is Valid: {{mainForm.valid}}</p>
+</div>
