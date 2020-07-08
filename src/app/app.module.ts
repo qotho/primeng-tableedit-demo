@@ -21,6 +21,8 @@ import {ProgressBarModule} from 'primeng/progressbar';
 import {InputTextModule} from 'primeng/inputtext';
 import {CheckboxModule} from 'primeng/checkbox';
 import { NgxJsonViewerModule } from 'ngx-json-viewer';
+import { AutoCompleteModule } from 'primeng/autocomplete';
+import { CountryService } from './country.service';
 
 @NgModule({
   imports: [
@@ -39,6 +41,7 @@ import { NgxJsonViewerModule } from 'ngx-json-viewer';
     InputTextModule,
     ProgressBarModule,
     CheckboxModule,
+    AutoCompleteModule,
     NgxJsonViewerModule,
     HttpClientModule,
     FormsModule,
@@ -46,7 +49,7 @@ import { NgxJsonViewerModule } from 'ngx-json-viewer';
   ],
   declarations: [ AppComponent ],
   bootstrap:    [ AppComponent ],
-  providers: [CarService]
+  providers: [ CarService, CountryService ]
 })
 
 export class AppModule { }

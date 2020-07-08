@@ -4,5 +4,6 @@ body {
 }
 
 .text-danger {
-  color: red;
+  color: darkred;
+  background-color: #f8b7bd !important;
 }

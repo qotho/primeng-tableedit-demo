@@ -1,6 +1,10 @@
 <p-toast></p-toast>
 
 <h3 class="first">Cell Editing Demo</h3>
+<p>
+    A table with editable cells.  Use Tab to move from column to column.  At the end of a row, Tab will move you to the 
+    beginning of the next row. If you are on the last column of the last row Tab or Enter will create a new row.
+</p>
 <form [formGroup]="mainForm">
 <p-table [value]="mainForm.get('carForms').controls" (onEditInit)="onCellEdit($event)" (onEditComplete)="onCellEditComplete($event)">
     <ng-template pTemplate="caption">
@@ -13,6 +17,7 @@
             <th style="width: 10%;">Sold?</th>
             <th>Date Sold</th>
             <th>Brand</th>
+            <th>Country</th>
             <th style="width: 10%;">Year</th>
             <th style="width: 10%;">Color</th>
         </tr>
@@ -24,7 +29,7 @@
                     <i class="pi pi-times" style="color: darkred;" (click)="deleteRow(index)"></i>
                     <!--button pButton type="button" class="ui-button-secondary" icon="pi pi-times" iconPos="left" (click)="onDeleteRow(rowIndex)"></button-->
                 </td>
-                <td #vin pEditableColumn [pEditableColumnField]="'vin'" [pEditableColumnRowIndex]="index">
+                <td #vin pEditableColumn [pEditableColumnField]="'vin'" [pEditableColumnRowIndex]="index" [ngClass]="{'text-danger': !rowData.get('vin').valid}">
                     <p-cellEditor>
                         <ng-template pTemplate="input">
                             <input pInputText type="text" formControlName="vin">
@@ -38,10 +43,16 @@
                         </ng-template>
                     </p-cellEditor>
                 </td>
-                <td style="text-align: center;">
-                    <!--p-toggleButton onLabel="" offLabel="" onIcon="pi pi-check" offIcon="pi pi-times" (onChange)="toggleSold($event, rowData)"></p-toggleButton-->
-                    <p-checkbox binary="true" formControlName="sold" (keydown)="onKeyDown($event)"></p-checkbox>
-                </td>                
+                <td pEditableColumn [pEditableColumnField]="'sold'" [pEditableColumnRowIndex]="index" style="text-align: center;">
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <p-checkbox binary="true" formControlName="sold"></p-checkbox>
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            <p-checkbox binary="true" formControlName="sold"></p-checkbox>
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
                 <td pEditableColumn [pEditableColumnField]="'soldDate'" [pEditableColumnRowIndex]="index">
                     <p-cellEditor>
                         <ng-template pTemplate="input">
@@ -52,10 +63,10 @@
                         </ng-template>
                     </p-cellEditor>
                 </td>
-                <td pEditableColumn [pEditableColumnField]="'brand'" [pEditableColumnRowIndex]="index">
+                <td pEditableColumn [pEditableColumnField]="'brand'" [pEditableColumnRowIndex]="index" [ngClass]="{'text-danger': !rowData.get('brand').valid}">
                     <p-cellEditor>
                         <ng-template pTemplate="input">
-                            <p-dropdown [options]="brands" formControlName="brand" [style]="{'width':'100%'}"></p-dropdown>
+                            <p-dropdown [options]="brands" formControlName="brand" [autoDisplayFirst]="false" [style]="{'width':'100%'}"></p-dropdown>
                             <div class="text-danger" *ngIf="rowData.get('brand')?.errors && (rowData.get('brand')?.dirty || rowData.get('brand')?.touched)">
                                 <small *ngIf="rowData.get('brand').errors?.required">Brand is required</small>
                             </div>
@@ -65,7 +76,21 @@
                         </ng-template>
                     </p-cellEditor>
                 </td>
-                <td pEditableColumn [pEditableColumnField]="'year'" [pEditableColumnRowIndex]="index">
+                <td pEditableColumn [pEditableColumnField]="'country'" [pEditableColumnRowIndex]="index" [ngClass]="{'text-danger': !rowData.get('country').valid}">
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                           <p-autoComplete formControlName="country" [dropdown]="true" [suggestions]="filteredCountries" [forceSelection]="true"
+                                (completeMethod)="onFilterCountries($event)" field="name" dataKey="code" [size]="30" placeholder="Country" [minLength]="1"></p-autoComplete>
+                            <div class="text-danger" *ngIf="rowData.get('country')?.errors && (rowData.get('country')?.dirty || rowData.get('country')?.touched)">
+                                <small *ngIf="rowData.get('country').errors?.required">Country is required</small>
+                            </div>
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{rowData.get('country').value?.name}}
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                <td pEditableColumn [pEditableColumnField]="'year'" [pEditableColumnRowIndex]="index" [ngClass]="{'text-danger': !rowData.get('year').valid}">
                     <p-cellEditor>
                         <ng-template pTemplate="input">
                             <input pInputText type="text" formControlName="year" required>
@@ -79,7 +104,7 @@
                         </ng-template>
                     </p-cellEditor>
                 </td>
-                <td pEditableColumn [pEditableColumnField]="'color'" [pEditableColumnRowIndex]="index">
+                <td pEditableColumn [pEditableColumnField]="'color'" [pEditableColumnRowIndex]="index" [ngClass]="{'text-danger': !rowData.get('color').valid}">
                     <p-cellEditor>
                         <ng-template pTemplate="input">
                             <input pInputText type="text" formControlName="color" (keydown)="onKeyDown($event)">
@@ -97,7 +122,7 @@
     </ng-template>
     <ng-template pTemplate="summary" let-rowData>
         <div style="height: 2.3em;">
-          <button pButton type="button" class="ui-toolbar-group-left" (click)="addRow()" label="Add Row"></button>
+          <button pButton type="button" class="ui-toolbar-group-left" (click)="addRow()" label="Add Row" [disabled]="!carForms.valid"></button>
           <button pButton type="button" class="ui-toolbar-group-right" label="Save" [disabled]="!mainForm.valid"></button>
         </div>
       </ng-template>

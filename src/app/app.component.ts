@@ -3,6 +3,8 @@ import {Validators, FormControl, FormGroup, FormBuilder, FormArray} from '@angul
 import { CarService } from './carservice';
 import { Car } from './car';
 import { SelectItem, MessageService } from 'primeng/api';
+import { CountryService } from './country.service';
+import { Country } from './country';
 
 
 @Component({
@@ -15,6 +17,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     mainForm: FormGroup;
 
     cars: Car[];
+
+    filteredCountries: Country[];
 
     brands: SelectItem[];
 
@@ -30,6 +34,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     constructor(
       private fb: FormBuilder,
       private carService: CarService,
+      private countryService: CountryService,
       private messageService: MessageService
     ) { }
 
@@ -87,6 +92,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         vin: ['', [Validators.required, Validators.minLength(6)]],
         year: ['', [Validators.required, Validators.pattern(/^\d{4}$/)]],
         brand: ['', Validators.required],
+        country: ['', Validators.required],
         color: ['', [Validators.required]],
         sold: [''],
         price : [''],
@@ -100,11 +106,34 @@ export class AppComponent implements OnInit, AfterViewInit {
         vin: car.vin,
         year: car.year,
         brand: car.brand,
+        country: car.country ? {name: car.country} : null,
         color: car.color,
         sold: car.sold,
         price: car.price,
         saleDate : car.saleDate
       });
+    }
+
+    onFilterCountries(event) {
+      const query = event.query;
+      this.countryService.getCountries().then(countries => {
+          this.filteredCountries = this.filterCountries(query, countries);
+      });
+    }
+
+    filterCountries(query: string, countries: Country[]): Country[] {
+      // In a real application, make a request to a remote url with the query and return filtered results, for demo we filter at client side
+      const filtered: any[] = [];
+
+      for (let i = 0; i < countries.length; i++) {
+          const country = countries[i];
+
+          if (country.name.toLowerCase().indexOf(query.toLowerCase()) === 0) {
+              filtered.push(country);
+          }
+      }
+
+      return filtered;
     }
 
     onCellEdit(event) {
@@ -124,7 +153,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
       if (
         event.originalEvent.key && event.originalEvent.key === 'Enter' &&
-        this.cellBeingEdited === 'color' && this.rowBeingEdited === this.cars.length - 1
+        this.cellBeingEdited === 'color' && this.rowBeingEdited === this.carForms.length - 1
       ) {
         this.addRow();
       }

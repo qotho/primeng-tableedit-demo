@@ -1,14 +1,14 @@
 {
     "data": [
-        {"brand": "VW", "year": 2012, "color": "Orange", "vin": "dsad231ff", "sold": true, "saleDate": "07/01/2020"},
-        {"brand": "Audi", "year": 2011, "color": "Black", "vin": "gwregre345", "sold": false},
-        {"brand": "Renault", "year": 2005, "color": "Gray", "vin": "h354htr", "sold": false},
-        {"brand": "BMW", "year": 2003, "color": "Blue", "vin": "j6w54qgh", "sold": false},
-        {"brand": "Mercedes", "year": 1995, "color": "Orange", "vin": "hrtwy34", "sold": false},
-        {"brand": "Volvo", "year": 2005, "color": "Black", "vin": "jejtyj", "sold": false},
-        {"brand": "Honda", "year": 2012, "color": "Yellow", "vin": "g43grf", "sold": false},
-        {"brand": "Jaguar", "year": 2013, "color": "Orange", "vin": "greg34", "sold": false},
-        {"brand": "Ford", "year": 2000, "color": "Black", "vin": "h54hw5", "sold": false},
+        {"brand": "VW", "country": "Germany", "year": 2012, "color": "Orange", "vin": "dsad231ff", "sold": true, "saleDate": "07/01/2020"},
+        {"brand": "Audi", "country": "Germany", "year": 2011, "color": "Black", "vin": "gwregre345", "sold": false},
+        {"brand": "Renault", "country": "France", "year": 2005, "color": "Gray", "vin": "h354htr", "sold": false},
+        {"brand": "BMW", "country": "Germany", "year": 2003, "color": "Blue", "vin": "j6w54qgh", "sold": false},
+        {"brand": "Mercedes", "country": "Germany", "year": 1995, "color": "Orange", "vin": "hrtwy34", "sold": false},
+        {"brand": "Volvo", "country": "Sweden", "year": 2005, "color": "Black", "vin": "jejtyj", "sold": false},
+        {"brand": "Honda", "country": "Japan", "year": 2012, "color": "Yellow", "vin": "g43grf", "sold": false},
+        {"brand": "Jaguar", "country": "United Kingdom", "year": 2013, "color": "Orange", "vin": "greg34", "sold": false},
+        {"brand": "Ford", "country": "United States", "year": 2000, "color": "Black", "vin": "h54hw5", "sold": false},
         {"brand": "Fiat", "year": 2013, "color": "Red", "vin": "245t2s", "sold": false}
     ]
 }
