@@ -1,8 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Car } from './car';
 import { Observable } from 'rxjs';
 import { delay } from 'rxjs/operators';
+import { Country } from './country';
 
 @Injectable()
 export class CarService {
@@ -10,19 +11,54 @@ export class CarService {
 
     colors: string[] = ['Black', 'White', 'Red', 'Blue', 'Silver', 'Green', 'Yellow'];
 
+    countries: Country[] = [
+        {'name': 'Afghanistan', 'code': 'AF'},
+        {'name': 'Åland Islands', 'code': 'AX'},
+        {'name': 'Albania', 'code': 'AL'},
+        {'name': 'Algeria', 'code': 'DZ'},
+        {'name': 'American Samoa', 'code': 'AS'},
+        {'name': 'Andorra', 'code': 'AD'},
+        {'name': 'Angola', 'code': 'AO'},
+        {'name': 'Anguilla', 'code': 'AI'},
+        {'name': 'Antarctica', 'code': 'AQ'},
+        {'name': 'Antigua and Barbuda', 'code': 'AG'},
+        {'name': 'Argentina', 'code': 'AR'},
+        {'name': 'Armenia', 'code': 'AM'},
+        {'name': 'Aruba', 'code': 'AW'},
+        {'name': 'Australia', 'code': 'AU'},
+        {'name': 'Austria', 'code': 'AT'},
+        {'name': 'Azerbaijan', 'code': 'AZ'},
+        {'name': 'Bahamas', 'code': 'BS'},
+        {'name': 'Bahrain', 'code': 'BH'},
+        {'name': 'Bangladesh', 'code': 'BD'},
+        {'name': 'Barbados', 'code': 'BB'},
+        {'name': 'Belarus', 'code': 'BY'},
+        {'name': 'Belgium', 'code': 'BE'},
+        {'name': 'Belize', 'code': 'BZ'},
+        {'name': 'Benin', 'code': 'BJ'},
+        {'name': 'Bermuda', 'code': 'BM'}
+    ];
+
     private virtualCars: Car[];
 
     constructor(private http: HttpClient) {
-        this.virtualCars = Array.from({length: 10000}).map(() => this.generateCar());
+        this.virtualCars = Array.from({length: 20}).map(() => this.generateCar());
     }
 
-    getCarsPage(first: number, last: number): Observable<Car[]> {
+    getCarsPage(first: number, last: number): Observable<HttpResponse<Car[]>> {
         return new Observable(subscriber => {
             // load data of required page
             const loadedCars = this.virtualCars.slice(first, last);
-            subscriber.next(loadedCars);
+            const res = new HttpResponse<Car[]>({
+                body: loadedCars,
+                status: 200,
+                headers: new HttpHeaders({'X-Total-Count': this.virtualCars.length + ''})
+            });
+            subscriber.next(res);
             subscriber.complete();
-        }).pipe(delay<Car[]>(Math.random() * 1000 + 250));
+        });
+        // Simulate calling a remote service
+        // .pipe(delay<HttpResponse<Car[]>>(Math.random() * 1000 + 250));
     }
 
     getCarsSmall() {
@@ -39,12 +75,32 @@ export class CarService {
         .then(data => { return data; });
     }
 
+    saveCar(car: Car): Observable<HttpResponse<Car>> {
+        return new Observable(subscriber => {
+            this.virtualCars.push(car);
+            const res = new HttpResponse<Car>({
+                body: car,
+                status: 200,
+                headers: new HttpHeaders({'X-Total-Count': this.virtualCars.length + ''})
+            });
+            subscriber.next(res);
+            subscriber.complete();
+        });
+        // Simulate calling a remote service
+        // .pipe(delay<HttpResponse<Car>>(Math.random() * 1000 + 250));
+    }
+
+    deleteCar(index: number): void {
+        this.virtualCars.splice(index, 1);
+    }
+
     generateCar(): Car {
         return {
             vin: this.generateVin(),
             brand: this.generateBrand(),
             color: this.generateColor(),
-            year: this.generateYear()
+            year: this.generateYear(),
+            country: this.generateCountry()
         }
     }
 
@@ -59,15 +115,20 @@ export class CarService {
         return text;
     }
 
-    generateBrand() {
+    generateBrand(): string {
         return this.brands[Math.floor(Math.random() * Math.floor(10))];
     }
 
-    generateColor() {
+    generateColor(): string {
         return this.colors[Math.floor(Math.random() * Math.floor(7))];
     }
 
-    generateYear() {
+    generateYear(): number {
         return 2000 + Math.floor(Math.random() * Math.floor(19));
     }
+
+    generateCountry(): string {
+        return this.countries[Math.floor(Math.random() * Math.floor(this.countries.length))].name;
+    }
+
 }
