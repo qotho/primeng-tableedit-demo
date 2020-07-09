@@ -5,7 +5,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppComponent } from './app.component';
-import { CarService } from './carservice';
+import { CarService } from './car.service';
 
 import {TableModule} from 'primeng/table';
 import {ToastModule} from 'primeng/toast';
