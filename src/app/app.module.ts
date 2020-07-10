@@ -23,6 +23,7 @@ import {CheckboxModule} from 'primeng/checkbox';
 import { NgxJsonViewerModule } from 'ngx-json-viewer';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { CountryService } from './country.service';
+import { TableExModule } from './table/tableex.module';
 
 @NgModule({
   imports: [
@@ -45,7 +46,8 @@ import { CountryService } from './country.service';
     NgxJsonViewerModule,
     HttpClientModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    TableExModule
   ],
   declarations: [ AppComponent ],
   bootstrap:    [ AppComponent ],

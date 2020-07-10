@@ -8,8 +8,7 @@
 <form [formGroup]="mainForm">
 <p-table [value]="carForms.controls" formArrayName="carForms" (onEditInit)="onCellEdit($event)" (onEditComplete)="onCellEditComplete($event)"
     [paginator]="true" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} items"
-    [loading]="loading" [showLoader]="true" [totalRecords]="totalItems"
-    [lazy]="true" (onLazyLoad)="loadCarsLazy($event)" [rows]="10">
+    [loading]="loading" [showLoader]="true" [totalRecords]="totalItems" [lazy]="true" (onLazyLoad)="loadCarsLazy($event)" [rows]="10">
     <ng-template pTemplate="caption">
         List of Cars
     </ng-template>
@@ -43,7 +42,7 @@
                 <i class="pi pi-times" style="color: darkred;" (click)="deleteRow(index)"></i>
                 <!--button pButton type="button" class="ui-button-secondary" icon="pi pi-times" iconPos="left" (click)="onDeleteRow(rowIndex)"></button-->
             </td>
-            <td #vin pEditableColumn [pEditableColumnField]="'vin'" [pEditableColumnRowIndex]="index" [ngClass]="{'text-danger': !rowData.get('vin').valid}">
+            <td #vin pEditableColumn appEditableColumn [pEditableColumnField]="'vin'" [pEditableColumnRowIndex]="index" [ngClass]="{'text-danger': !rowData.get('vin').valid}">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <input pInputText type="text" formControlName="vin">
@@ -57,7 +56,7 @@
                     <small *ngIf="rowData.get('vin').errors?.minlength">VIN must be at least {{rowData.get('vin').errors?.minlength.requiredLength}} characters</small>
                 </div>
             </td>
-            <td pEditableColumn [pEditableColumnField]="'sold'" [pEditableColumnRowIndex]="index" style="text-align: center;">
+            <td pEditableColumn appEditableColumn [pEditableColumnField]="'sold'" [pEditableColumnRowIndex]="index" style="text-align: center;">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <p-checkbox binary="true" formControlName="sold"></p-checkbox>
@@ -67,7 +66,7 @@
                     </ng-template>
                 </p-cellEditor>
             </td>
-            <td pEditableColumn [pEditableColumnField]="'soldDate'" [pEditableColumnRowIndex]="index">
+            <td pEditableColumn appEditableColumn [pEditableColumnField]="'soldDate'" [pEditableColumnRowIndex]="index">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <p-calendar formControlName="saleDate" showButtonBar="true" monthNavigator="true" 
@@ -78,7 +77,7 @@
                     </ng-template>
                 </p-cellEditor>
             </td>
-            <td pEditableColumn [pEditableColumnField]="'brand'" [pEditableColumnRowIndex]="index" [ngClass]="{'text-danger': !rowData.get('brand').valid}">
+            <td pEditableColumn appEditableColumn [pEditableColumnField]="'brand'" [pEditableColumnRowIndex]="index" [ngClass]="{'text-danger': !rowData.get('brand').valid}">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <p-dropdown [options]="brands" formControlName="brand" [autoDisplayFirst]="false" [style]="{'width':'100%'}"></p-dropdown>
@@ -91,7 +90,7 @@
                     <small *ngIf="rowData.get('brand').errors?.required">Brand is required</small>
                 </div>
             </td>
-            <td pEditableColumn [pEditableColumnField]="'country'" [pEditableColumnRowIndex]="index" [ngClass]="{'text-danger': !rowData.get('country').valid}">
+            <td pEditableColumn appEditableColumn [pEditableColumnField]="'country'" [pEditableColumnRowIndex]="index" [ngClass]="{'text-danger': !rowData.get('country').valid}">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <p-autoComplete formControlName="country" [dropdown]="true" [suggestions]="filteredCountries" [forceSelection]="true"
@@ -105,7 +104,7 @@
                     <small *ngIf="rowData.get('country').errors?.required">Country is required</small>
                 </div>
             </td>
-            <td pEditableColumn [pEditableColumnField]="'year'" [pEditableColumnRowIndex]="index" [ngClass]="{'text-danger': !rowData.get('year').valid}">
+            <td pEditableColumn appEditableColumn [pEditableColumnField]="'year'" [pEditableColumnRowIndex]="index" [ngClass]="{'text-danger': !rowData.get('year').valid}">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <input pInputText type="text" formControlName="year" required>
@@ -119,7 +118,7 @@
                     <small *ngIf="rowData.get('year').errors?.pattern">Numbers only, 4 digits required</small>
                 </div>
             </td>
-            <td pEditableColumn [pEditableColumnField]="'color'" [pEditableColumnRowIndex]="index" [ngClass]="{'text-danger': !rowData.get('color').valid}">
+            <td pEditableColumn appEditableColumn [pEditableColumnField]="'color'" [pEditableColumnRowIndex]="index" [ngClass]="{'text-danger': !rowData.get('color').valid}">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <input pInputText type="text" formControlName="color" (keydown)="onKeyDown($event)">
