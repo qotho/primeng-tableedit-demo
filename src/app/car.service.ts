@@ -90,8 +90,16 @@ export class CarService {
         // .pipe(delay<HttpResponse<Car>>(Math.random() * 1000 + 250));
     }
 
-    deleteCar(index: number): void {
-        this.virtualCars.splice(index, 1);
+    deleteCar(index: number): Observable<HttpResponse<void>> {
+        return new Observable(subscriber => {
+            this.virtualCars.splice(index, 1);
+            const res = new HttpResponse<void>({
+                status: 200,
+                headers: new HttpHeaders({'X-Total-Count': this.virtualCars.length + ''})
+            });
+            subscriber.next(res);
+            subscriber.complete();
+        });
     }
 
     generateCar(): Car {

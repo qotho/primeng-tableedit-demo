@@ -1,3 +1,23 @@
 :host ::ng-deep .ui-inputtext.ng-dirty.ng-invalid {
   background-color: #f8b7bd !important;
 }
+
+:host ::ng-deep .ui-inputtext:enabled:focus:not(.ui-state-error) {
+  outline: 0 none;
+  outline-offset: 0;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  border: #8dcdff solid 2px;
+}
+
+:host ::ng-deep .ui-dropdown:not(.ui-state-disabled).ui-state-focus {
+  outline: 0 none;
+  outline-offset: 0;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  border: #8dcdff solid 2px;
+}
+
+:host ::ng-deep .ui-paginator-current {
+  float: left;
+}

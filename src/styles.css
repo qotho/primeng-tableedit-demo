@@ -7,3 +7,10 @@ body {
   color: darkred;
   background-color: #f8b7bd !important;
 }
+
+td.pi.delete-cell {
+  color: darkred;
+  text-align: center;
+  display: table-cell; 
+  cursor: pointer;
+}

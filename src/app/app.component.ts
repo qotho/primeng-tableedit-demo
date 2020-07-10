@@ -1,11 +1,12 @@
-import { Component, ViewChildren, QueryList, ElementRef, OnInit, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ViewChildren, QueryList, ElementRef, OnInit, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy, ViewChild } from '@angular/core';
 import {Validators, FormControl, FormGroup, FormBuilder, FormArray} from '@angular/forms';
 import { CarService } from './car.service';
 import { Car } from './car';
-import { SelectItem, MessageService, LazyLoadEvent } from 'primeng/api';
+import { SelectItem, MessageService, LazyLoadEvent, ConfirmationService } from 'primeng/api';
 import { CountryService } from './country.service';
 import { Country } from './country';
 import { HttpResponse, HttpHeaders } from '@angular/common/http';
+import { Paginator } from 'primeng/paginator';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -41,6 +42,8 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   lastSaved: any = {};
 
+  @ViewChild(Paginator) private paginator: Paginator;
+
   // @ViewChildren('vin', {read: EditableColumn}) private editableColumns: QueryList<EditableColumn>;
   @ViewChildren('vin') private editableColumns: QueryList<ElementRef>;
 
@@ -49,7 +52,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     private carService: CarService,
     private countryService: CountryService,
     private changeDetectorRef: ChangeDetectorRef,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
   ) { }
 
   ngOnInit() {
@@ -96,15 +100,15 @@ export class AppComponent implements OnInit, AfterViewInit {
     // event.sortField = Field name to sort with
     // event.sortOrder = Sort order as number, 1 for asc and -1 for dec
     // filters: FilterMetadata object having field as key and filter value, filter matchMode as value
+    this.itemsPerPage = event.rows;
     this.loadPage(event.first);
   }
 
   loadPage(firstRow: number): void {
     this.loading = true;
     this.firstRow = firstRow;
-    this.carService.getCarsPage(firstRow, (firstRow + this.itemsPerPage))
-    .subscribe(
-      (res: HttpResponse<Car[]>) => this.onSuccess(res.body, res.headers),
+    this.carService.getCarsPage(firstRow, (firstRow + this.itemsPerPage)).subscribe(
+      (res: HttpResponse<Car[]>) => this.onLoadSuccess(res.body, res.headers),
       () => this.onError()
     );
   }
@@ -121,6 +125,9 @@ export class AppComponent implements OnInit, AfterViewInit {
 
         this.carService.saveCar(car).subscribe((res: HttpResponse<Car>) => {
           this.totalItems = Number(res.headers.get('X-Total-Count'));
+          // If the user added new rows, reset back to the first page.
+          // TODO How to tell if it is a new row?
+          this.loadPage(0);
           this.messageService.add({severity: 'success', summary: 'Success', detail: 'Car changes saved'});
         });
         return car;
@@ -178,6 +185,32 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
   }
 
+  addRow() {
+    const newCar = this.newCarForm();
+    this.carForms.push(newCar);
+    //newCar.markAsTouched();
+    //newCar.markAsDirty();
+    this.newRowAdded = true;
+  }
+
+  deleteRow(index: number) {
+    this.confirmationService.confirm({
+      message: 'Are you sure you want to delete this item?',
+      accept: () => {
+        this.carService.deleteCar(index).subscribe((res: HttpResponse<void>) => {
+          this.totalItems = Number(res.headers.get('X-Total-Count'));
+          this.carForms.removeAt(index);
+          //this.loadPage(this.firstRow);
+          this.messageService.add({severity: 'success', summary: 'Success', detail: 'Car deleted'});
+        });
+      }
+    });
+  }
+
+  editRow(group: FormGroup) {
+    group.get('isEditable').setValue(true);
+  }
+
   onFilterCountries(event) {
     const query = event.query;
     this.countryService.getCountries().then(countries => {
@@ -186,7 +219,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   filterCountries(query: string, countries: Country[]): Country[] {
-    // In a real application, make a request to a remote url with the query and return filtered results, for demo we filter at client side
+    // In a real application, make a request to a remote url with the query and return filtered results, for demo we filter client side
     const filtered: any[] = [];
 
     for (let i = 0; i < countries.length; i++) {
@@ -203,18 +236,14 @@ export class AppComponent implements OnInit, AfterViewInit {
   onCellEdit(event) {
     this.rowBeingEdited = event.index;
     this.cellBeingEdited = event.field;
-    //const car = this.cars[event.index];
-    //const patched = {};
-    //patched[event.field] = car[event.field];
-    //this.mainForm.patchValue(patched);
-    // this.mainForm.markAsPending();
-    // this.mainForm.markAsDirty();
+    const field = this.carForms.get(String(event.index))?.get(event.field);
+
+    if (field) {
+      field.markAsDirty();
+    }
   }
 
   onCellEditComplete(event) {
-    // const car = this.cars[this.rowBeingEdited];
-    // car[event.field] = this.mainForm.get(event.field).value;
-
     if (
       event.originalEvent.key && event.originalEvent.key === 'Enter' &&
       this.cellBeingEdited === 'color' && this.rowBeingEdited === this.carForms.length - 1
@@ -224,22 +253,6 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     this.rowBeingEdited = -1;
     this.cellBeingEdited = null;
-}
-
-  addRow() {
-    this.carForms.push(this.newCarForm());
-    // this.cars1.push({'brand': '', 'year': 2020, 'color': '', 'vin': '', 'sold': false});
-    this.newRowAdded = true;
-  }
-
-  deleteRow(index: number) {
-    //this.carForms.removeAt(index);
-    this.carService.deleteCar(index);
-    this.loadPage(0);
-  }
-
-  editRow(group: FormGroup) {
-    group.get('isEditable').setValue(true);
   }
 
   onKeyDown(event: KeyboardEvent) {
@@ -251,14 +264,12 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
   }
 
-  protected onSuccess(data: Car[] | null, headers: HttpHeaders): void {
+  protected onLoadSuccess(data: Car[] | null, headers: HttpHeaders): void {
     this.totalItems = Number(headers.get('X-Total-Count'));
     // populate page of cars
     this.cars = data || [];
     this.carForms.clear();
     this.addCarForms(this.cars);
-    // Trigger change detection
-    // this.mainForm.setControl('carForms', new FormArray(Object.values(this.carForms.controls)));
     this.loading = false;
   }
 

@@ -14,6 +14,7 @@ import {SliderModule} from 'primeng/slider';
 import {MultiSelectModule} from 'primeng/multiselect';
 import {ContextMenuModule} from 'primeng/contextmenu';
 import {DialogModule} from 'primeng/dialog';
+import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {ButtonModule} from 'primeng/button';
 import {ToggleButtonModule} from 'primeng/togglebutton';
 import {DropdownModule} from 'primeng/dropdown';
@@ -24,6 +25,7 @@ import { NgxJsonViewerModule } from 'ngx-json-viewer';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { CountryService } from './country.service';
 import { TableExModule } from './table/tableex.module';
+import { ConfirmationService } from 'primeng/api';
 
 @NgModule({
   imports: [
@@ -33,6 +35,7 @@ import { TableExModule } from './table/tableex.module';
     CalendarModule,
     SliderModule,
     DialogModule,
+    ConfirmDialogModule,
     MultiSelectModule,
     ContextMenuModule,
     DropdownModule,
@@ -51,7 +54,7 @@ import { TableExModule } from './table/tableex.module';
   ],
   declarations: [ AppComponent ],
   bootstrap:    [ AppComponent ],
-  providers: [ CarService, CountryService ]
+  providers: [ CarService, CountryService, ConfirmationService ]
 })
 
 export class AppModule { }
