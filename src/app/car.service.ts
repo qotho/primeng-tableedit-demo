@@ -75,6 +75,21 @@ export class CarService {
         .then(data => { return data; });
     }
 
+    saveCars(cars: Car[]): Observable<HttpResponse<Car[]>> {
+        return new Observable(subscriber => {
+            this.virtualCars = this.virtualCars.concat(cars);
+            const res = new HttpResponse<Car[]>({
+                body: cars,
+                status: 200,
+                headers: new HttpHeaders({'X-Total-Count': this.virtualCars.length + ''})
+            });
+            subscriber.next(res);
+            subscriber.complete();
+        });
+        // Simulate calling a remote service
+        // .pipe(delay<HttpResponse<Car>>(Math.random() * 1000 + 250));
+    }
+
     saveCar(car: Car): Observable<HttpResponse<Car>> {
         return new Observable(subscriber => {
             this.virtualCars.push(car);

@@ -123,14 +123,15 @@ export class AppComponent implements OnInit, AfterViewInit {
           car.country = car.country.name;
         }
 
-        this.carService.saveCar(car).subscribe((res: HttpResponse<Car>) => {
-          this.totalItems = Number(res.headers.get('X-Total-Count'));
-          // If the user added new rows, reset back to the first page.
-          // TODO How to tell if it is a new row?
-          this.loadPage(0);
-          this.messageService.add({severity: 'success', summary: 'Success', detail: 'Car changes saved'});
-        });
         return car;
+      });
+  
+      this.carService.saveCars(this.lastSaved).subscribe((res: HttpResponse<Car[]>) => {
+        this.totalItems = Number(res.headers.get('X-Total-Count'));
+        // If the user added new rows, reset back to the first page.
+        // TODO How to tell if it is a new row?
+        this.loadPage(0);
+        this.messageService.add({severity: 'success', summary: 'Success', detail: 'Car changes saved'});
       });
   }
 
@@ -158,16 +159,28 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.carForms.push(newCarForm);
   }
 
-  newCarForm(): FormGroup {
+  parseBool(v: string){
+    if (v === null || v === undefined) {
+      return false;
+    }
+    
+    switch (v.toLowerCase().trim()) {
+        case "true": case "t": case "yes": case "y": case "1": return true;
+        case "false": case "f": case "no": case "n": case "0": case null: return false;
+        default: return Boolean(v);
+    }
+  }
+
+  newCarForm(data?: any[]): FormGroup {
     return this.fb.group({
-      vin: ['', [Validators.required, Validators.minLength(6)]],
-      year: ['', [Validators.required, Validators.pattern(/^\d{4}$/)]],
-      brand: ['', Validators.required],
-      country: ['', Validators.required],
-      color: ['', [Validators.required]],
-      sold: [''],
+      vin: [data && data.length >= 1 ? data[0] : '', [Validators.required, Validators.minLength(6)]],
+      sold: [data && data.length >= 2 ? this.parseBool(data[1]) : ''],
+      saleDate : [data && data.length >= 3 ? data[2] : ''],
+      brand: [data && data.length >= 4 ? data[3] : '', Validators.required],
+      country: [{name: data && data.length >= 5 ? data[4] : ''}, Validators.required],
+      year: [data && data.length >= 6 ? data[5] : '', [Validators.required, Validators.pattern(/^\d{4}$/)]],
+      color: [data && data.length >= 7 ? data[6] : '', [Validators.required]],
       price : [''],
-      saleDate : [''],
       isEditable: [true] // Only needed if we are using our own table
     });
   }
@@ -185,11 +198,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
   }
 
-  addRow() {
-    const newCar = this.newCarForm();
+  addRow(data?: any[]) {
+    const newCar = this.newCarForm(data);
+    newCar.markAsDirty();
     this.carForms.push(newCar);
-    //newCar.markAsTouched();
-    //newCar.markAsDirty();
     this.newRowAdded = true;
   }
 
@@ -253,6 +265,29 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     this.rowBeingEdited = -1;
     this.cellBeingEdited = null;
+  }
+
+  onPaste(event: ClipboardEvent) {
+    this.loading = true;
+
+    try {
+      let clipboardData = event.clipboardData;
+      let pastedText = clipboardData.getData('text');
+
+      if (pastedText && pastedText.search(/[\t\n]/) >= 0) {
+        let rows = pastedText.split(/\r*\n+/);
+        rows.forEach((row, index) => {
+          if (row) {
+            this.addRow(row.split('\t'));
+          }
+        });
+        this.totalItems = this.totalItems + rows.length;
+        this.firstRow = 0;
+        event.preventDefault();
+      }
+    } finally {
+      this.loading = false;
+    }
   }
 
   onKeyDown(event: KeyboardEvent) {

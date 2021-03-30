@@ -1,13 +1,27 @@
 import { EditableColumn, Table } from 'primeng/table';
 import { DomHandler } from 'primeng/dom';
-import { Directive, HostListener, ElementRef, NgZone, AfterViewInit } from '@angular/core';
+import { Directive, HostListener, ElementRef, NgZone, AfterViewInit, Output } from '@angular/core';
+import { EventEmitter } from '@angular/core';
 
 @Directive({
     selector: '[appEditableColumn]'
 })
 export class EditableColumnDirective {
 
+    @Output() paste = new EventEmitter();
+  
     constructor(public dt: Table, private col: EditableColumn, public el: ElementRef, public zone: NgZone) {}
+
+    // @HostListener('paste', ['$event'])
+    // onPaste(event: ClipboardEvent) {
+    //     let clipboardData = event.clipboardData;
+    //     let pastedText = clipboardData.getData('text');
+
+    //     if (pastedText && pastedText.indexOf('\t') >= 0) {
+    //         this.paste.emit(pastedText);
+    //         event.preventDefault();
+    //     }
+    // }
 
     @HostListener('keydown.arrowleft', ['$event'])
     onArrowLeftKeyDown(event: KeyboardEvent) {

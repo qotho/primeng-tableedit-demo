@@ -8,7 +8,7 @@
     beginning of the next row. If you are on the last column of the last row Tab or Enter will create a new row.
 </p>
 <form [formGroup]="mainForm">
-<p-table [value]="carForms.controls" formArrayName="carForms" (onEditInit)="onCellEdit($event)" (onEditComplete)="onCellEditComplete($event)"
+<p-table (paste)="onPaste($event)" [value]="carForms.controls" formArrayName="carForms" (onEditInit)="onCellEdit($event)" (onEditComplete)="onCellEditComplete($event)"
     [paginator]="true" [(first)]="firstRow" [showCurrentPageReport]="true" currentPageReportTemplate="{first} to {last} of {totalRecords} items"
     [loading]="loading" [showLoader]="true" [totalRecords]="totalItems" [lazy]="true" (onLazyLoad)="loadCarsLazy($event)"
     [resizableColumns]="true" [rowsPerPageOptions]="[10,20,50,100]" [rows]="10">
@@ -146,7 +146,7 @@
 <div class="output">
     <h3>Is Valid: {{mainForm.valid}}</h3>
     <h3>Last Saved:</h3>
-    <ngx-json-viewer [json]="lastSaved"></ngx-json-viewer>
+    <!--ngx-json-viewer [json]="lastSaved"></ngx-json-viewer-->
     <h3>Form Data:</h3>
-    <ngx-json-viewer [json]="mainForm.value"></ngx-json-viewer>
+    <!--ngx-json-viewer [json]="mainForm.value"></ngx-json-viewer-->
 </div>
