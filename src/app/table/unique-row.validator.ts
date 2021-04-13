@@ -2,8 +2,33 @@ import {
     ValidatorFn,
     AbstractControl,
     FormArray,
-    FormGroup
+    FormGroup,
+    ValidationErrors
 } from "@angular/forms";
+
+const ERROR_KEY = "unique";
+
+function hasUniqueError(control: AbstractControl): boolean {
+    return control.errors && control.errors[ERROR_KEY]
+}
+
+/*
+    Meant to trigger uniqueRowValidator to revalidate rows
+    when there is a change, like deleting one of the duplicate rows.
+    This validator doesn't do any validation itself.
+
+    NOTE: This may be getting called too often. Might be better to just call when the row is deleted.
+*/
+export function uniqueRowArrayChangeValidator(control: AbstractControl): ValidationErrors {
+    const formArray = control as FormArray;
+    formArray.controls.forEach(fg => {
+        if (hasUniqueError(fg)) {
+            fg.updateValueAndValidity({onlySelf: true})
+        }
+    });
+
+    return null;
+}
 
 export function uniqueRowValidator(fieldNames: string[]): ValidatorFn {
     const subset = (obj: object, fields: string[]) => fields.reduce((a, b)=> (a[b] = obj[b], a), {});
@@ -33,10 +58,6 @@ export function uniqueRowValidator(fieldNames: string[]): ValidatorFn {
         }, 200)
     }
 
-    const alreadyHasUniqueError = (formGroup: FormGroup): boolean => {
-        return formGroup.errors && formGroup.errors['unique']
-    }
-
     return (control: FormGroup): { [key: string]: any } => {
         if (control.value) {
             let formArray = getParentFormArray(control);
@@ -50,9 +71,9 @@ export function uniqueRowValidator(fieldNames: string[]): ValidatorFn {
                 for (let formGroup of formArray.controls) {
                     if (formGroup != control) {
                         isMatched = rowsMatch(fieldNames, formGroup.value, currentRowValue);
-                        isMatched = (isMatched && !alreadyHasUniqueError(formGroup))
+                        isMatched = (isMatched && !hasUniqueError(formGroup))
 
-                        if (alreadyHasUniqueError(formGroup)) {
+                        if (hasUniqueError(formGroup)) {
                             // Find the other control that matches this one
                             const matchedControl = formArray.controls.filter(t => {
                                 t != formGroup && rowsMatch(fieldNames, t.value, formGroup.value);
@@ -78,7 +99,9 @@ export function uniqueRowValidator(fieldNames: string[]): ValidatorFn {
                 }
 
                 if (isMatched) {
-                    return {'unique': [control.value]};
+                    const error = {};
+                    error[ERROR_KEY] = [control.value];
+                    return error;
                 }
             }
         }

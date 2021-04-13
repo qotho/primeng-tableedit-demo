@@ -7,8 +7,7 @@ import { CountryService } from './country.service';
 import { Country } from './country';
 import { HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Paginator } from 'primeng/paginator';
-import { uniqueRowValidator } from './table/unique-row.validator';
-import { RxwebValidators } from '@rxweb/reactive-form-validators';
+import { uniqueRowValidator, uniqueRowArrayChangeValidator } from './table/unique-row.validator';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -60,7 +59,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.loading = true;
-    const carForms = this.fb.array([]);
+    const carForms = this.fb.array([], uniqueRowArrayChangeValidator);
     this.mainForm = this.fb.group({
       carForms: carForms
     });
@@ -224,38 +223,21 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   deleteRow(index: number) {
-    this.confirmationService.confirm({
-      message: 'Are you sure you want to delete this item?',
-      accept: () => {
+    // this.confirmationService.confirm({
+    //   message: 'Are you sure you want to delete this item?',
+    //   accept: () => {
         this.carService.deleteCar(index).subscribe((res: HttpResponse<void>) => {
           this.totalItems = Number(res.headers.get('X-Total-Count'));
-          const rowToDelete = this.carForms.at(index);
           this.carForms.removeAt(index);
           //this.loadPage(this.firstRow);
           this.messageService.add({severity: 'success', summary: 'Success', detail: 'Car deleted'});
 
           // Update uniqueness validation on other rows
-          if (rowToDelete.errors && rowToDelete.errors['unique']) {
-            this.revalidateUniqueness();
-          }
+          // uniqueRowArrayChangeValidator(this.carForms);
         });
-      }
-    });
+    //   }
+    // });
   }
-
-  revalidateUniqueness() {
-    // Update uniqueness validation on other rows
-    this.carForms.controls.forEach(g => {
-      if (g.errors && g.errors['unique']) {
-        g.updateValueAndValidity({onlySelf: true})
-      }
-      // const c = (g as FormGroup).controls['vin'];
-
-      // if (c.errors && c.errors['unique']) {
-      //   c.updateValueAndValidity({onlySelf: true})
-      // }
-    });
-  }  
 
   editRow(group: FormGroup) {
     group.get('isEditable').setValue(true);

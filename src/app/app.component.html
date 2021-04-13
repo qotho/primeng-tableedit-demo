@@ -43,13 +43,13 @@
         <tr [formGroupName]="index - firstRow" class="ui-fluid" style="height:34px">
             <td class="pi delete-cell" (click)="deleteRow(index - firstRow)">&#xe90b;
                 <!--button pButton type="button" class="ui-button-secondary" icon="pi pi-times" iconPos="left" (click)="onDeleteRow(rowIndex)"></button-->
+                <i class="pi pi-exclamation-triangle" *ngIf="rowData?.errors"></i>
             </td>
 
             <td #vin pEditableColumn appEditableColumn [pEditableColumnField]="'vin'" [pEditableColumnRowIndex]="index" [ngClass]="{'text-danger': !rowData.get('vin').valid}">
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <input pInputText type="text" formControlName="vin">
-                        <i class="pi pi-exclamation-triangle" *ngIf="rowData?.errors"></i>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{rowData.get('vin').value}}
@@ -85,7 +85,6 @@
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <p-dropdown [options]="brands" formControlName="brand" [autoDisplayFirst]="false" [style]="{'width':'100%'}" appendTo="body"></p-dropdown>
-                        <i class="pi pi-exclamation-triangle" *ngIf="rowData?.errors"></i>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{rowData.get('brand').value}}
@@ -114,7 +113,6 @@
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         <input pInputText type="text" formControlName="year" required>
-                        <i class="pi pi-exclamation-triangle" *ngIf="rowData?.errors"></i>
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{rowData.get('year').value}}
