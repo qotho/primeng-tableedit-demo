@@ -7,6 +7,8 @@ import { CountryService } from './country.service';
 import { Country } from './country';
 import { HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Paginator } from 'primeng/paginator';
+import { uniqueRowValidator } from './table/unique-row.validator';
+import { RxwebValidators } from '@rxweb/reactive-form-validators';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -171,6 +173,20 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
   }
 
+  // additionalValidation(currentValue: any, indexOf: number, fieldName: string, row: any, formArrayValues: any[]): boolean {
+  //   const uniqueKey = ['vin', 'brand']
+  //   const different = (fields: string[], o1: any, o2: any) => fields.some(field => o1[field] !== o2[field]);
+  //   row[fieldName] = currentValue;
+
+  //   for (let otherRow of formArrayValues) {
+  //     if (!different(uniqueKey, row, otherRow)) {
+  //       return false;
+  //     }
+  //   }
+
+  //   return true;
+  // }
+
   newCarForm(data?: any[]): FormGroup {
     return this.fb.group({
       vin: [data && data.length >= 1 ? data[0] : '', [Validators.required, Validators.minLength(6)]],
@@ -182,7 +198,9 @@ export class AppComponent implements OnInit, AfterViewInit {
       color: [data && data.length >= 7 ? data[6] : '', [Validators.required]],
       price : [''],
       isEditable: [true] // Only needed if we are using our own table
-    });
+    }, 
+    {validators: [uniqueRowValidator(['vin', 'brand', 'year'])]}
+    );
   }
 
   updateCarForm(newCarForm: FormGroup, car: Car): void {
@@ -211,13 +229,33 @@ export class AppComponent implements OnInit, AfterViewInit {
       accept: () => {
         this.carService.deleteCar(index).subscribe((res: HttpResponse<void>) => {
           this.totalItems = Number(res.headers.get('X-Total-Count'));
+          const rowToDelete = this.carForms.at(index);
           this.carForms.removeAt(index);
           //this.loadPage(this.firstRow);
           this.messageService.add({severity: 'success', summary: 'Success', detail: 'Car deleted'});
+
+          // Update uniqueness validation on other rows
+          if (rowToDelete.errors && rowToDelete.errors['unique']) {
+            this.revalidateUniqueness();
+          }
         });
       }
     });
   }
+
+  revalidateUniqueness() {
+    // Update uniqueness validation on other rows
+    this.carForms.controls.forEach(g => {
+      if (g.errors && g.errors['unique']) {
+        g.updateValueAndValidity({onlySelf: true})
+      }
+      // const c = (g as FormGroup).controls['vin'];
+
+      // if (c.errors && c.errors['unique']) {
+      //   c.updateValueAndValidity({onlySelf: true})
+      // }
+    });
+  }  
 
   editRow(group: FormGroup) {
     group.get('isEditable').setValue(true);
