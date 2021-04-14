@@ -9,7 +9,7 @@ import {
 const ERROR_KEY = "unique";
 
 function hasUniqueError(control: AbstractControl): boolean {
-    return control.errors && control.errors[ERROR_KEY]
+    return control.errors && control.errors[ERROR_KEY];
 }
 
 /*
@@ -37,45 +37,44 @@ export function uniqueRowValidator(fieldNames: string[]): ValidatorFn {
 
     const rowsMatch = (fields: string[], o1: object, o2: object) => fields.every(field => String(o1[field]) === String(o2[field]));
 
-    let getParentFormArray = (control: AbstractControl) => {
+    const getParentFormArray = (control: AbstractControl) => {
         if (control.parent && !(control.parent instanceof FormArray)) {
-            let parent = getParentFormArray(control.parent)
-            return parent;
+            return getParentFormArray(control.parent);
         }
         return control.parent;
-    }
+    };
 
-    var revalidateOtherRows = (rowsToRevalidate: FormGroup[], controlValues: any[]) => {
-        let timeOut = setTimeout(() => {
+    const revalidateOtherRows = (rowsToRevalidate: FormGroup[], controlValues: any[]) => {
+        const timeOut = setTimeout(() => {
             rowsToRevalidate.forEach(t => {
                 let isMatched = controlValues.filter(x => rowsMatch(fieldNames, x, t.value))[0];
 
                 if (!isMatched) {
                     t.updateValueAndValidity();
                 }
-            })
+            });
             clearTimeout(timeOut);
-        }, 200)
-    }
+        }, 200);
+    };
 
     return (control: FormGroup): { [key: string]: any } => {
         if (control.value) {
-            let formArray = getParentFormArray(control);
-            let rowsToRevalidate: FormGroup[] = [];
-            let controlValues = [];
+            const formArray = getParentFormArray(control);
+            const rowsToRevalidate: FormGroup[] = [];
+            const controlValues = [];
 
             if (formArray && control) {
                 const currentRowValue = control.value;
                 let isMatched = false;
 
-                for (let formGroup of formArray.controls) {
+                for (const formGroup of formArray.controls) {
                     if (formGroup != control) {
                         isMatched = rowsMatch(fieldNames, formGroup.value, currentRowValue);
                         isMatched = (isMatched && !hasUniqueError(formGroup))
 
                         if (hasUniqueError(formGroup)) {
                             // Find the other control that matches this one
-                            const matchedControl = formArray.controls.filter(t => {
+                            const matchedControl = formArray.controls.filter((t: AbstractControl) => {
                                 t != formGroup && rowsMatch(fieldNames, t.value, formGroup.value);
                             })[0];
 
