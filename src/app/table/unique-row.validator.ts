@@ -17,7 +17,7 @@ function hasUniqueError(control: AbstractControl): boolean {
     when there is a change, like deleting one of the duplicate rows.
     This validator doesn't do any validation itself.
 
-    NOTE: This may be getting called too often. Might be better to just call when the row is deleted.
+    NOTE: This may be getting called too often. Might be better to just call when a row is deleted.
 */
 export function uniqueRowArrayChangeValidator(control: AbstractControl): ValidationErrors {
     const formArray = control as FormArray;
@@ -75,7 +75,7 @@ export function uniqueRowValidator(fieldNames: string[]): ValidatorFn {
                         if (hasUniqueError(formGroup)) {
                             // Find the other control that matches this one
                             const matchedControl = formArray.controls.filter((t: AbstractControl) => {
-                                t != formGroup && rowsMatch(fieldNames, t.value, formGroup.value);
+                                return t != formGroup && rowsMatch(fieldNames, t.value, formGroup.value);
                             })[0];
 
                             if (!matchedControl) {
