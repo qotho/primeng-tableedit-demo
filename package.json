@@ -17,7 +17,7 @@
     "@types/jasmine": "3.3.16",
     "@types/jasminewd2": "2.0.8",
     "@types/node": "8.9.5",
-    "chart.js": "2.9.3",
+    "chart.js": "2.9.4",
     "ngx-json-viewer": "^2.4.0",
     "primeflex": "1.1.0",
     "primeicons": "1.0.0",
